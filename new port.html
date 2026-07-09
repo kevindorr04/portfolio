@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kevin Dorr — Portfolio</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #111110;
+    --surface: #1a1a18;
+    --border: #2a2a27;
+    --white: #f0efe9;
+    --gray-100: #222220;
+    --gray-200: #2e2e2b;
+    --gray-400: #6b6b67;
+    --gray-600: #9a9a94;
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--white);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ── PAGE SYSTEM ── */
+  .page {
+    position: fixed;
+    inset: 0;
+    overflow-y: auto;
+    transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.45s ease;
+    background: var(--bg);
+  }
+
+  .page.hidden-right {
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .page.hidden-left {
+    transform: translateX(-6%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    background: rgba(17,17,16,0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+    padding: 0 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    flex-shrink: 0;
+  }
+
+  .nav-name {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 14px;
+    color: var(--gray-400);
+    transition: color 0.15s;
+  }
+
+  .nav-links a:hover, .nav-links a.active { color: var(--white); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 7rem 2.5rem 6rem;
+    max-width: 800px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
+    color: var(--white);
+  }
+
+  .hero-meta {
+    font-size: 15px;
+    color: var(--gray-600);
+    margin-bottom: 2rem;
+    line-height: 1.7;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--gray-400);
+  }
+
+  /* ── PROJECTS LIST ── */
+  .projects-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2.5rem;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 3rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Project row — sticky text + scrolling images */
+  .project {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    min-height: 100vh;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .project:last-child { border-bottom: none; }
+
+  .project-text {
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    padding: 4rem 3rem 4rem 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: start;
+  }
+
+  .project-number {
+    font-size: 11px;
+    color: var(--gray-400);
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 1.25rem;
+  }
+
+  .project-title {
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  .project-subtitle {
+    font-size: 14px;
+    color: var(--gray-400);
+    margin-bottom: 1rem;
+  }
+
+  .project-phases {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .phase {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+
+  .project-status {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    background: rgba(160, 96, 0, 0.15);
+    color: #c88a30;
+    border-radius: 2px;
+    border: 1px solid rgba(160, 96, 0, 0.3);
+    width: fit-content;
+    margin-bottom: 1.5rem;
+  }
+
+  .project-description {
+    font-size: 14px;
+    color: var(--gray-600);
+    line-height: 1.75;
+    margin-bottom: 2rem;
+  }
+
+  .view-project-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 16px;
+    cursor: pointer;
+    background: none;
+    transition: color 0.15s, border-color 0.15s;
+    width: fit-content;
+  }
+
+  .view-project-btn:hover { color: var(--white); border-color: var(--gray-400); }
+
+  .view-project-btn svg { transition: transform 0.15s; }
+  .view-project-btn:hover svg { transform: translateX(3px); }
+
+  /* Scrolling images panel */
+  .project-images {
+    padding: 4rem 0 4rem 3rem;
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .image-slot {
+    width: 100%;
+    aspect-ratio: 4/3;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .image-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 5px;
+    cursor: zoom-in;
+    transition: opacity 0.15s;
+  }
+
+  .image-slot img:hover { opacity: 0.9; }
+
+  .image-slot-label {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    text-align: center;
+    padding: 0 1.5rem;
+    line-height: 1.7;
+  }
+
+  .image-slot-empty {
+    aspect-ratio: auto;
+    min-height: 140px;
+    border-style: dashed;
+    padding: 1rem;
+  }
+
+  /* ── CONTACT ── */
+  .contact-section {
+    border-top: 1px solid var(--border);
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 4rem 2.5rem 6rem;
+  }
+
+  .contact-section h2 {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-links {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .contact-link {
+    font-size: 15px;
+    color: var(--gray-600);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .contact-link:hover { color: var(--white); border-color: var(--gray-400); }
+
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox.open { display: flex; }
+
+  .lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .lightbox-close:hover { color: var(--white); }
+
+  /* ══════════════════════════════════════════
+     DETAIL PAGE
+  ══════════════════════════════════════════ */
+  #page-detail {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .detail-nav {
+    position: sticky;
+    top: 0;
+    background: rgba(17,17,16,0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+    padding: 0 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    flex-shrink: 0;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--gray-400);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.15s;
+    padding: 0;
+  }
+
+  .back-btn:hover { color: var(--white); }
+  .back-btn svg { transition: transform 0.15s; }
+  .back-btn:hover svg { transform: translateX(-3px); }
+
+  .detail-nav-title {
+    font-size: 14px;
+    color: var(--gray-600);
+    letter-spacing: -0.01em;
+  }
+
+  /* Detail hero */
+  .detail-hero {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 5rem 2.5rem 3rem;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+  }
+
+  .detail-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 1rem;
+  }
+
+  .detail-title {
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+  }
+
+  .detail-subtitle {
+    font-size: 16px;
+    color: var(--gray-400);
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-phases {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  /* Detail body */
+  .detail-body {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 3rem 2.5rem 6rem;
+    width: 100%;
+  }
+
+  .detail-description {
+    font-size: 16px;
+    color: var(--gray-600);
+    line-height: 1.8;
+    max-width: 620px;
+    margin-bottom: 4rem;
+  }
+
+  /* Media grid on detail page */
+  .detail-media-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .detail-media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .detail-media-slot {
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .detail-media-slot img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
+    cursor: zoom-in;
+    transition: opacity 0.15s;
+  }
+
+  .detail-media-slot img:hover { opacity: 0.85; }
+
+  .detail-media-slot video {
+    width: 100%;
+    aspect-ratio: 16/9;
+    display: block;
+    background: #000;
+  }
+
+  .detail-media-slot .media-caption {
+    font-size: 12px;
+    color: var(--gray-400);
+    padding: 8px 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .detail-empty {
+    font-size: 13px;
+    color: var(--gray-400);
+    font-style: italic;
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 700px) {
+    nav, .detail-nav { padding: 0 1rem; }
+    .nav-links { display: none; }
+    .hero, .projects-section, .contact-section, .detail-hero, .detail-body { padding-left: 1rem; padding-right: 1rem; }
+    .project { grid-template-columns: 1fr; min-height: unset; }
+    .project-text { position: relative; top: 0; height: auto; padding: 2.5rem 0 1.5rem; }
+    .project-images { padding: 0 0 2.5rem; border-left: none; border-top: 1px solid var(--border); }
+    .detail-media-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     HOME PAGE
+══════════════════════════════════════════ -->
+<div class="page" id="page-home">
+
+  <nav>
+    <span class="nav-name" onclick="goHome()">Kevin Dorr</span>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="hero-eyebrow">Mechanical Engineering Portfolio</p>
+    <h1 id="hero-name"></h1>
+    <p class="hero-meta" id="hero-meta"></p>
+    <div class="hero-tags">
+      <span class="tag">Manufacturing</span>
+      <span class="tag">Machine Design</span>
+      <span class="tag">Robotics</span>
+      <span class="tag">CAD / CAM</span>
+      <span class="tag">Mechanisms</span>
+    </div>
+  </header>
+
+  <main class="projects-section" id="projects">
+    <p class="section-label">Projects — Most Recent First</p>
+    <div id="project-list"></div>
+  </main>
+
+  <section class="contact-section" id="contact">
+    <h2>Contact</h2>
+    <div class="contact-links" id="contact-links"></div>
+  </section>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     DETAIL PAGE
+══════════════════════════════════════════ -->
+<div class="page hidden-right" id="page-detail">
+
+  <div class="detail-nav">
+    <button class="back-btn" onclick="goHome()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      All Projects
+    </button>
+    <span class="detail-nav-title" id="detail-nav-title"></span>
+  </div>
+
+  <div class="detail-hero">
+    <p class="detail-eyebrow" id="detail-eyebrow"></p>
+    <h1 class="detail-title" id="detail-title"></h1>
+    <p class="detail-subtitle" id="detail-subtitle"></p>
+    <div class="detail-phases" id="detail-phases"></div>
+  </div>
+
+  <div class="detail-body">
+    <p class="detail-description" id="detail-description"></p>
+    <p class="detail-media-label">Photos & Video</p>
+    <div class="detail-media-grid" id="detail-media-grid"></div>
+  </div>
+
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+/* ============================================================
+   EDIT YOUR CONTENT HERE
+   ============================================================ */
+
+/* -- Header info ------------------------------------------- */
+const NAME   = "Kevin Dorr";
+const SCHOOL = "Virginia Tech";
+const YEAR   = "Class of 2027";
+const MAJOR  = "B.S. Mechanical Engineering";
+
+/* -- Contact links ----------------------------------------- */
+const CONTACT = [
+  { label: "kevin23@vt.edu",  href: "mailto:kevin23@vt.edu" },
+  { label: "LinkedIn",        href: "https://linkedin.com/in/kevindorrvt" },
+];
+
+/* -- Projects (most recent first) --------------------------
+   Fields:
+     id          -- unique slug, don't change
+     title       -- project name
+     subtitle    -- secondary line, or null
+     phases      -- tags shown under the title
+     wip         -- true shows a WIP badge
+     description -- short blurb shown on the home page card
+     details     -- longer write-up shown on the project detail page
+                    (can be the same as description if you prefer)
+     images      -- photos shown on the HOME PAGE card (keep to 2-4)
+                    Format: "images/filename.jpg"
+                    Put files in an "images/" folder next to this HTML file.
+     media       -- everything shown on the DETAIL PAGE
+                    Mix photos and videos freely.
+                    Each item is an object:
+                      { type: "image", src: "images/foo.jpg", caption: "optional caption" }
+                      { type: "video", src: "videos/bar.mp4", caption: "optional caption" }
+                    Put video files in a "videos/" folder next to this HTML file.
+                    Supported video formats: .mp4 (recommended), .webm, .mov
+   ---------------------------------------------------------- */
+const projects = [
+  {
+    id: "cnc-v2",
+    title: "Desktop CNC V2",
+    subtitle: null,
+    phases: ["Design", "Development", "Testing"],
+    wip: true,
+    description: "Small footprint low-cost CNC aimed at machining aluminum with tight tolerances. Designed and built from the ground up.",
+    details: "Small footprint low-cost CNC aimed at machining aluminum with tight tolerances. Designed and built from the ground up.",
+    images: ["images/no_spoil.jpg", "images/cad_render.jpg", "images/spoilboard_added.jpg"],
+    media: [],
+  },
+  {
+    id: "planar-arm",
+    title: "2 DOF Planar Arm",
+    subtitle: "Plasma Cutter / Drawing",
+    phases: ["Design", "Development"],
+    wip: false,
+    description: "3D printed belt driven robot arm to trace and cut sheet metal parts from DXFs. Designed from scratch.",
+    details: "3D printed belt driven robot arm to trace and cut sheet metal parts from DXFs. Designed from scratch.",
+    images: [],
+    media: [],
+  },
+  {
+    id: "rangefinder",
+    title: "Golf Rangefinder",
+    subtitle: null,
+    phases: ["Development", "Design"],
+    wip: false,
+    description: "Simple DIY golf rangefinder that uses a phone's GPS to determine the distance to the front, middle, and back of the green.",
+    details: "Simple DIY golf rangefinder that uses a phone's GPS to determine the distance to the front, middle, and back of the green.",
+    images: [],
+    media: [],
+  },
+  {
+    id: "arm-3dof",
+    title: "Robotic Gearbox Application",
+    subtitle: "3DOF Arm",
+    phases: ["Design", "Integration"],
+    wip: false,
+    description: "Designed and built a 3DOF robot arm, applying previously developed 3D printed Cycloidal and Planetary gearboxes.",
+    details: "Designed and built a 3DOF robot arm, applying previously developed 3D printed Cycloidal and Planetary gearboxes.",
+    images: [],
+    media: [],
+  },
+  {
+    id: "gearbox",
+    title: "Robotic Gearbox",
+    subtitle: "Cycloidal & Planetary",
+    phases: ["Design", "Development", "Testing"],
+    wip: false,
+    description: "Designed, built, and tested 3D printed gearboxes for NEMA-17 stepper motors implemented in robotics.",
+    details: "Designed, built, and tested 3D printed gearboxes for NEMA-17 stepper motors implemented in robotics.",
+    images: [],
+    media: [],
+  },
+  {
+    id: "putter-v3",
+    title: "Putter Project V3",
+    subtitle: null,
+    phases: ["Design", "Manufacturing"],
+    wip: false,
+    description: "Modular mid-mallet golf putter. Swappable sole plates for on the fly customization. Designed and machined from scratch.",
+    details: "Modular mid-mallet golf putter. Swappable sole plates for on the fly customization. Designed and machined from scratch.",
+    images: [],
+    media: [],
+  },
+  {
+    id: "cnc-v1",
+    title: "Desktop CNC V1",
+    subtitle: null,
+    phases: ["Design", "Development", "Testing"],
+    wip: false,
+    description: "My first desktop CNC. Designed to cut wood and for some light passes in aluminum. Fully designed and built from scratch.",
+    details: "My first desktop CNC. Designed to cut wood and for some light passes in aluminum. Fully designed and built from scratch.",
+    images: [],
+    media: [],
+  },
+  {
+    id: "putter-v2",
+    title: "Putter Project V2",
+    subtitle: null,
+    phases: ["Design", "Manufacturing"],
+    wip: false,
+    description: "Modular blade style golf putter. Swappable back plates for on the fly customization and weight adjustment. Designed and machined from scratch.",
+    details: "Modular blade style golf putter. Swappable back plates for on the fly customization and weight adjustment. Designed and machined from scratch.",
+    images: [],
+    media: [],
+  },
+  {
+    id: "putter-v1",
+    title: "Putter Project V1",
+    subtitle: null,
+    phases: ["Design", "Manufacturing"],
+    wip: false,
+    description: "Full mallet golf putter, designed and machined from scratch.",
+    details: "Full mallet golf putter, designed and machined from scratch.",
+    images: [],
+    media: [],
+  },
+];
+
+/* ============================================================
+   END OF EDITABLE CONTENT — don't edit below this line
+   ============================================================ */
+
+/* ── page transitions ── */
+function goHome() {
+  document.getElementById('page-home').classList.remove('hidden-left');
+  const detail = document.getElementById('page-detail');
+  detail.classList.add('hidden-right');
+  detail.classList.remove('hidden-left');
+  // scroll home page back to top of projects if coming from a project
+  setTimeout(() => {
+    document.getElementById('page-home').scrollTop = 0;
+  }, 10);
+}
+
+function goDetail(id) {
+  const p = projects.find(x => x.id === id);
+  if (!p) return;
+
+  // populate detail page
+  document.getElementById('detail-nav-title').textContent = p.title;
+  document.getElementById('detail-eyebrow').textContent   = p.phases.join(' · ');
+  document.getElementById('detail-title').textContent     = p.title;
+  document.getElementById('detail-subtitle').textContent  = p.subtitle || '';
+  document.getElementById('detail-description').textContent = p.details || p.description;
+
+  // phases
+  const phasesEl = document.getElementById('detail-phases');
+  phasesEl.innerHTML = p.phases.map(ph => `<span class="phase">${ph}</span>`).join('');
+  if (p.wip) phasesEl.innerHTML += `<span class="project-status">WIP</span>`;
+
+  // media grid
+  const grid = document.getElementById('detail-media-grid');
+  grid.innerHTML = '';
+  if (!p.media || p.media.length === 0) {
+    grid.innerHTML = `<p class="detail-empty">No photos or videos added yet.</p>`;
+  } else {
+    p.media.forEach(item => {
+      const slot = document.createElement('div');
+      slot.className = 'detail-media-slot';
+      if (item.type === 'image') {
+        slot.innerHTML = `
+          <img src="${item.src}" alt="${item.caption || ''}" onclick="openLightbox('${item.src}')">
+          ${item.caption ? `<div class="media-caption">${item.caption}</div>` : ''}`;
+      } else if (item.type === 'video') {
+        slot.innerHTML = `
+          <video controls preload="metadata">
+            <source src="${item.src}">
+            Your browser does not support video.
+          </video>
+          ${item.caption ? `<div class="media-caption">${item.caption}</div>` : ''}`;
+      }
+      grid.appendChild(slot);
+    });
+  }
+
+  // scroll detail page to top, then show it
+  const detailPage = document.getElementById('page-detail');
+  detailPage.scrollTop = 0;
+  detailPage.classList.remove('hidden-right');
+
+  document.getElementById('page-home').classList.add('hidden-left');
+}
+
+/* ── lightbox ── */
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+/* ── render image on home card ── */
+function renderHomeImages(pid, imagePaths) {
+  const grid = document.getElementById('grid-' + pid);
+  if (!grid) return;
+  grid.innerHTML = '';
+  if (!imagePaths || imagePaths.length === 0) {
+    grid.innerHTML = `<div class="image-slot image-slot-empty">
+      <span class="image-slot-label">Add paths to the images[ ] array in the code</span>
+    </div>`;
+    return;
+  }
+  imagePaths.forEach(src => {
+    const slot = document.createElement('div');
+    slot.className = 'image-slot';
+    const img = document.createElement('img');
+    img.src = src; img.alt = '';
+    img.onclick = () => openLightbox(src);
+    img.onerror = () => { slot.innerHTML = `<span class="image-slot-label">File not found:<br>${src}</span>`; };
+    slot.appendChild(img);
+    grid.appendChild(slot);
+  });
+}
+
+/* ── apply config ── */
+function applyConfig() {
+  document.querySelector('.nav-name').textContent    = NAME;
+  document.getElementById('hero-name').textContent   = NAME;
+  document.getElementById('hero-meta').textContent   = `${SCHOOL}\u00a0\u00a0·\u00a0\u00a0${YEAR}\u00a0\u00a0·\u00a0\u00a0${MAJOR}`;
+  const cl = document.getElementById('contact-links');
+  cl.innerHTML = CONTACT.map(c => `<a class="contact-link" href="${c.href}">${c.label}</a>`).join('');
+}
+
+/* ── render home project list ── */
+function renderProjects() {
+  const list = document.getElementById('project-list');
+  list.innerHTML = '';
+  projects.forEach((p, i) => {
+    const num     = String(projects.length - i).padStart(2, '0');
+    const total   = String(projects.length).padStart(2, '0');
+    const el      = document.createElement('article');
+    el.className  = 'project';
+    el.id         = 'proj-' + p.id;
+
+    const phasesHtml = p.phases.map(ph => `<span class="phase">${ph}</span>`).join('');
+    const wipHtml    = p.wip ? `<div class="project-status" style="margin-bottom:1.5rem;">WIP</div>` : '';
+    const subHtml    = p.subtitle ? `<div class="project-subtitle">${p.subtitle}</div>` : '';
+
+    el.innerHTML = `
+      <div class="project-text">
+        <div class="project-number">${num} / ${total}</div>
+        <div class="project-title">${p.title}</div>
+        ${subHtml}
+        <div class="project-phases">${phasesHtml}</div>
+        ${wipHtml}
+        <div class="project-description">${p.description}</div>
+        <button class="view-project-btn" onclick="goDetail('${p.id}')">
+          View Project
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+      <div class="project-images" id="grid-${p.id}"></div>`;
+
+    list.appendChild(el);
+    renderHomeImages(p.id, p.images);
+  });
+}
+
+/* ── nav highlight ── */
+const navObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    const link = document.querySelector(`nav a[href="#${e.target.id}"]`);
+    if (link) link.classList.toggle('active', e.isIntersecting);
+  });
+}, { threshold: 0.2 });
+['projects','contact'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) navObserver.observe(el);
+});
+
+applyConfig();
+renderProjects();
+</script>
+</body>
+</html>
